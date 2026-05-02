@@ -1,7 +1,9 @@
 package edu.hyf.car_rental.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -13,7 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
+//Don’t include relationships in toString()
+@ToString(exclude = "rentalRecord")
+
 
 public class Car {
     @Id
@@ -26,6 +30,7 @@ public class Car {
 
     @NotNull
     @Column(nullable = false, unique = true)
+    @Pattern(regexp = "^\\d{1}-[A-Z]{3}-\\d{3}$", message = "Wrong plate format: E.g: 1-RTY-456.")
     private String plate;
 
     @NotNull
@@ -42,6 +47,7 @@ public class Car {
     private CarStatus status = CarStatus.AVAILABLE;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Rental> rentalRecord = new ArrayList<>();
 
     public void addRental(Rental rental) {

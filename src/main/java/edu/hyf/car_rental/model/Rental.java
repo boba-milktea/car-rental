@@ -13,7 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
+//Don’t include relationships in toString()
+@ToString(exclude = "car")
 
 public class Rental {
     @Id

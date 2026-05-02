@@ -3,6 +3,7 @@ package edu.hyf.car_rental.service;
 import edu.hyf.car_rental.dto.CarRequestDTO;
 import edu.hyf.car_rental.dto.CarResponseDTO;
 import edu.hyf.car_rental.dto.CarUpdateRequestDTO;
+import edu.hyf.car_rental.dto.RentalResponseDTO;
 import edu.hyf.car_rental.exception.CarNotFoundException;
 import edu.hyf.car_rental.mapper.CarMapper;
 import edu.hyf.car_rental.model.Car;
@@ -10,6 +11,8 @@ import edu.hyf.car_rental.model.CarStatus;
 import edu.hyf.car_rental.repository.CarRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -48,6 +51,11 @@ public class CarService {
     public List<Car> searchBy(){
         // TODO
         return crepo.findByStatus(CarStatus.valueOf("AVAILABLE"));
+    }
+
+    // Get all available cars for a rental period.
+    public List<CarResponseDTO> getAvailableCars(LocalDate startDate, LocalDate returnDate){
+        return crepo.getAvailableCars(startDate, returnDate).stream().map(mapper::toResponseDTO).toList();
     }
 
     /* POST */
