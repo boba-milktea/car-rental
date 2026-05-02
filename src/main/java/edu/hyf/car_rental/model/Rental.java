@@ -33,7 +33,7 @@ public class Rental {
     @Column(name="return_date", nullable = false)
     private LocalDate returnDate;
 
-    @Column(name="exact_return_date")
+    @Column(name="exact_return_date", nullable = true)
     private LocalDate exactReturnDate;
 
     @ManyToOne(fetch = FetchType.LAZY)

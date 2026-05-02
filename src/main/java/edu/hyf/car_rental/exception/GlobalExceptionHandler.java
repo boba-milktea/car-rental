@@ -42,4 +42,18 @@ public class GlobalExceptionHandler {
         return violations;
     }
 
+    // Handle CarNotFoundException
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CarNotFoundException.class)
+    public Map<String, String> handleCarNotFound(CarNotFoundException exception) {
+       return Map.of("error", exception.getMessage());
+    }
+
+    // Handle RentalNotFoundException
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(RentalNotFoundException.class)
+    public Map<String, String> handleRentalNotFound(RentalNotFoundException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
 }
