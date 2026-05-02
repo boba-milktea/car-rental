@@ -9,11 +9,14 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CarMapper {
-    // @Mapping(source = "car.rental.id", target = "rentalId")
     CarResponseDTO toResponseDTO(Car car);
-    // @Mapping(target = "id", ignore = true)
+    //Ignore fields not provided by DTO
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "rentalRecord", ignore = true)
     Car toEntity(CarRequestDTO dto);
-    // Used in car_rental.service.updateCar()
+    //Used in car_rental.service.updateCar()
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "rentalRecord", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDTO(CarUpdateRequestDTO dto, @MappingTarget Car car);
 }

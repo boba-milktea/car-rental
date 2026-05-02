@@ -21,18 +21,17 @@ public @interface EndDateAfterStartDate {
 
         @Override
         public boolean isValid(DateRange dateRange, ConstraintValidatorContext context) {
-            if (dateRange.getStartDate() == null || dateRange.getReturnDate() == null ) {
+            if (dateRange == null) {
                 return true;
             }
-            boolean result = false;
-            if(dateRange.getReturnDate().isAfter(dateRange.getStartDate())){
-                result = true;
-            }
-            if(dateRange.getExactReturnDate() == null || dateRange.getExactReturnDate().isAfter(dateRange.getStartDate())){
-                result = true;
+
+            if (dateRange.getStartDate() == null || dateRange.getReturnDate() == null) {
+                return true;
             }
 
-            return  result;
+            return dateRange.getReturnDate().isAfter(dateRange.getStartDate());
+
+            // exactReturnDate can be null while creating a new rental, we add it while return (completeRental)
         }
     }
 }

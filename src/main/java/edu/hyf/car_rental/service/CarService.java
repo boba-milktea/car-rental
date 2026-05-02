@@ -68,9 +68,9 @@ public class CarService {
     public ResponseEntity<?> updateCar(Long id, CarUpdateRequestDTO carDTO){
         Car car = IsCar(id);
         if(car == null){return ResponseEntity.notFound().build();}
-        System.out.println("Before mapper: " + car);
+      //  System.out.println("Before mapper: " + car);
         mapper.updateFromDTO(carDTO,car);
-        System.out.println("After mapper: " + car);
+       // System.out.println("After mapper: " + car);
         crepo.save(car);
         return ResponseEntity.ok(car);
 

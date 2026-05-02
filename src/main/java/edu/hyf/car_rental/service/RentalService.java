@@ -2,6 +2,8 @@ package edu.hyf.car_rental.service;
 
 import edu.hyf.car_rental.dto.RentalRequestDTO;
 import edu.hyf.car_rental.dto.RentalResponseDTO;
+import edu.hyf.car_rental.exception.CarNotFoundException;
+import edu.hyf.car_rental.exception.RentalNotFoundException;
 import edu.hyf.car_rental.mapper.CarMapper;
 import edu.hyf.car_rental.mapper.RentalMapper;
 import edu.hyf.car_rental.model.Car;
@@ -39,9 +41,10 @@ public class RentalService {
     public RentalResponseDTO findRentalById(Long id) {
         Rental rental = rentalRepo.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Rental not found"));
+                        new RentalNotFoundException(id));
         return mapper.toResponseDTO(rental);
     }
+
     /* GET RENTALS BY CAR ID */
     public List<RentalResponseDTO> findRentalByCarId(Long carId) {
         return rentalRepo.findRentalByCarId(carId).stream().map(mapper::toResponseDTO).toList();
@@ -61,11 +64,22 @@ public class RentalService {
         Long carId = dto.getCarId();
         Car car = carRepo.findById(carId)
                 .orElseThrow(() ->
-                        new RuntimeException("Car with id " + carId + " not found"));
+                        new CarNotFoundException(carId));
+
         // Check if car is not rented at date.
         if (!isCarAvailable(dto)) {
             throw new RuntimeException("Car already rented");
         }
+
+        System.out.println("DTO carId = " + dto.getCarId());
+        System.out.println("DB car id = " + car.getId());
+        System.out.println("DB car status = " + car.getStatus());
+
+        // Check if car is not available (in maintain or manually entered as RENTED)
+        if (car.getStatus() != CarStatus.AVAILABLE) {
+            throw new IllegalStateException("Car not usable.");
+        }
+
         // TODO if date include current date.
         Rental rental = mapper.toEntity(dto);
         rental.setCar(car);
@@ -73,6 +87,7 @@ public class RentalService {
         Rental saved = rentalRepo.save(rental);
         return mapper.toResponseDTO(saved);
     }
+
     // Used to check if car is available.
     private boolean isCarAvailable(RentalRequestDTO dto){
         return findRentalByCarId(dto.getCarId()).stream().noneMatch(
@@ -86,7 +101,13 @@ public class RentalService {
     public RentalResponseDTO activateRental(Long id) {
         Rental rental = rentalRepo.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Rental not found"));
+                       new RentalNotFoundException(id));
+
+        // Check if the car is available for rental
+        if (rental.getCar().getStatus() != CarStatus.AVAILABLE) {
+            throw new IllegalStateException("Cat is not available for rental");
+        }
+
         rental.getCar().setStatus(CarStatus.RENTED);
         Rental updated = rentalRepo.save(rental);
         return mapper.toResponseDTO(updated);
@@ -97,7 +118,11 @@ public class RentalService {
     public RentalResponseDTO completeRental(Long id) {
         Rental rental = rentalRepo.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Rental not found"));
+                        new RentalNotFoundException(id));
+
+        // Set the exact return date
+        rental.setExactReturnDate(LocalDate.now());
+
         rental.getCar().setStatus(CarStatus.AVAILABLE);
 
         Rental updated = rentalRepo.save(rental);
@@ -109,7 +134,7 @@ public class RentalService {
     public RentalResponseDTO cancelRental(Long id) {
         Rental rental = rentalRepo.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Rental not found"));
+                        new RentalNotFoundException(id));
         rental.getCar().setStatus(CarStatus.AVAILABLE);
         rentalRepo.delete(rental);
         return mapper.toResponseDTO(rental);

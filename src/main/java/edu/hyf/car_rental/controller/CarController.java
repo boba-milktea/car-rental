@@ -3,7 +3,6 @@ package edu.hyf.car_rental.controller;
 import edu.hyf.car_rental.dto.CarRequestDTO;
 import edu.hyf.car_rental.dto.CarResponseDTO;
 import edu.hyf.car_rental.dto.CarUpdateRequestDTO;
-import edu.hyf.car_rental.dto.RentalResponseDTO;
 import edu.hyf.car_rental.model.Car;
 import edu.hyf.car_rental.service.CarService;
 import jakarta.validation.Valid;
